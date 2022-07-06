@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:found_and_lost/Controller/userDataController.dart';
 import 'package:found_and_lost/helper/sizeHelper.dart';
 import 'package:found_and_lost/main.dart';
 import 'package:found_and_lost/model/post.dart';
-import 'package:found_and_lost/model/question.dart';
 import 'package:provider/provider.dart';
 
 class AddItemScreen extends StatefulWidget {
@@ -35,14 +33,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
     'questionText': ''
   };
 
-   var userName;
-   @override
-  void didChangeDependencies() async{
-     final user = await Provider.of<UserDataController>(context,listen: false)
-         .currentUserInfo;
-     userName = user!.name;
-     super.didChangeDependencies();
+  var userName;
+  @override
+  void didChangeDependencies() async {
+    final user = await Provider.of<UserDataController>(context, listen: false)
+        .currentUserInfo;
+    userName = user!.name;
+    super.didChangeDependencies();
   }
+
   @override
   Widget build(BuildContext context) {
     final size = SizeHelper(context);
@@ -63,7 +62,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
         _isLoading = true;
       });
       try {
-        await Provider.of<QuestionController>(context,listen: false)
+        await Provider.of<QuestionController>(context, listen: false)
             .createQuestion(postData['questionText'])
             .then((value) async {
           final tempPost = Post(
@@ -73,26 +72,54 @@ class _AddItemScreenState extends State<AddItemScreen> {
               itemName: postData['itemName'],
               userName: userName,
               userId: userIdentification);
-          await Provider.of<PostController>(context,listen: false).createPost(tempPost).then((value) {
-            showDialog(context: context,
+          await Provider.of<PostController>(context, listen: false)
+              .createPost(tempPost)
+              .then((value) {
+            showDialog(
+                context: context,
                 builder: (_) => AlertDialog(
-              title: Text('Done'),
-                  content: Container(
-                    height: size.setHeight(100),
-                    child: Column(
-                      children: <Widget>[
-                        Icon(FontAwesomeIcons.check,color: Colors.greenAccent,),
-                        SizedBox(height: size.setHeight(15),),
-                        Text('Thank you post uploading done'),
+                      title: Center(
+                          child: Text(
+                        'Done',
+                        style: TextStyle(fontSize: size.setWidth(20)),
+                      )),
+                      content: Container(
+                        height: size.setHeight(130),
+                        child: Column(
+                          children: <Widget>[
+                            Icon(
+                              FontAwesomeIcons.circleCheck,
+                              color: Colors.greenAccent,
+                              size: size.setWidth(40),
+                            ),
+                            SizedBox(
+                              height: size.setHeight(15),
+                            ),
+                            Text(
+                              'Thank you post uploading done',
+                              style: TextStyle(
+                                  fontSize: size.setWidth(22),
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Center(
+                            child: Text(
+                              'Back to home',
+                              style: TextStyle(
+                                fontSize: size.setWidth(18),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                  actions: [
-                    TextButton(onPressed: () {
-                      Navigator.pop(context);
-                    }, child: Text('Back to home'),),
-                  ],
-            )).then((value) {
+                    )).then((value) {
               Navigator.pop(context);
             });
           });
@@ -129,13 +156,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   height: size.setHeight(150),
                   margin: EdgeInsets.only(left: size.setWidth(25)),
                   padding: EdgeInsets.all(size.setWidth(10)),
-                  child:  Text(
-                          'Hello $userName, \nThank you for being cooperative person',
-                          style: TextStyle(
-                              fontSize: size.setWidth(24),
-                              fontFamily: 'Nexa',
-                              fontWeight: FontWeight.bold),
-                        ),
+                  child: Text(
+                    'Hello $userName, \nThank you for being cooperative person',
+                    style: TextStyle(
+                        fontSize: size.setWidth(24),
+                        fontFamily: 'Nexa',
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               SizedBox(
