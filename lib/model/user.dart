@@ -1,0 +1,8 @@
+class AuthenticatedUser {
+  late final String? id;
+  late final String name;
+  late final String email;
+  late final String password;
+  late final String? loginStatus;
+  AuthenticatedUser({this.id,required this.email,required this.password,required this.name,this.loginStatus});
+}
