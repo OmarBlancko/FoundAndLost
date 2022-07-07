@@ -54,6 +54,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
             .showSnackBar(getSnackBar('Please fill post data'));
         return;
       }
+      if(postData['itemName'].length < 2 ||
+          postData['postText'].length < 10||
+          postData['questionText'].length < 10)
+      {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(getSnackBar('Data is too short, enter full data please'));
+        return;
+      }
       if (!_formKey.currentState!.validate()) {
         return;
       }
@@ -90,7 +98,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                             Icon(
                               FontAwesomeIcons.circleCheck,
                               color: Colors.greenAccent,
-                              size: size.setWidth(40),
+                              size: size.setWidth(44),
                             ),
                             SizedBox(
                               height: size.setHeight(15),

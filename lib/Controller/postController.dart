@@ -24,19 +24,20 @@ class PostController with ChangeNotifier {
       for (var post in temp) {
         loadedPosts.add(Post(
             postId: post['postId'],
-            postingDate: post['postingDate'],
+            postingDate: post['postingDate'].toString(),
             postText: post['postText'],
             itemName: post['itemName'],
             userName: post['userName'],
             userId: post['userId']));
       }
       _posts = loadedPosts;
-      loadedPosts.clear();
-      for (var element in _posts) {
-        if (kDebugMode) {
-          print(element.postText);
-        }
-      }
+      // print(_posts.length);
+
+      // for (var element in _posts) {
+      //   if (kDebugMode) {
+      //     print(element.postText);
+      //   }
+      // }
       notifyListeners();
     } catch (e) {
       if (kDebugMode) {

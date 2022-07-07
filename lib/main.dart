@@ -11,6 +11,7 @@ import 'package:found_and_lost/model/question.dart';
 import 'package:found_and_lost/view/screens/add_item_screen.dart';
 import 'package:found_and_lost/view/screens/auth_screen.dart';
 import 'package:found_and_lost/view/screens/home_screen.dart';
+import 'package:found_and_lost/view/screens/lost_items_screen.dart';
 import 'package:found_and_lost/view/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 // import 'package:provider/provider.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
             AuthScreen.routeName:(ctx) => AuthScreen(),
             HomeScreen.routName:(ctx) => HomeScreen(),
             AddItemScreen.routeName:(ctx) =>AddItemScreen(),
+            LostItemsScreen.routeName:(ctx) =>LostItemsScreen(),
           },
 
 
