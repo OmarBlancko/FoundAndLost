@@ -1,16 +1,21 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:found_and_lost/Controller/authController.dart';
 import 'package:found_and_lost/Controller/userDataController.dart';
 import 'package:found_and_lost/helper/curve_painter.dart';
+import 'package:found_and_lost/main.dart';
 import 'package:found_and_lost/view/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../../helper/sizeHelper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../model/user.dart';
+import '../widgets/user_image_picker.dart';
 
 enum AuthMode { signUp, login }
 
@@ -41,25 +46,19 @@ class _AuthScreenState extends State<AuthScreen> {
     'password': '',
     'confirmPassword': '',
     'email': '',
+    'imageUrl':'',
   };
+  File? _userImageFile;
+  void _pickedImage(File image) {
+    _userImageFile = image;
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = SizeHelper(context);
 
-    final fieldWidth = size.setWidth(340);
-    final fieldMargin = EdgeInsets.only(top: size.setWidth(5));
-    final fieldPadding = EdgeInsets.symmetric(
-      horizontal: size.setWidth(10),
-    );
-    final labelTextStyle =
-        TextStyle(fontSize: size.setWidth(16), fontFamily: 'Aller');
-    final containerDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(25),
-      color: Theme.of(context).colorScheme.secondary,
-    );
-
-
     void _submit() async {
+      UserCredential userCredential;
       if ((userData['userName'] == '' ||
               userData['password'] == '' ||
               userData['confirmPassword'] == '' ||
@@ -69,7 +68,11 @@ class _AuthScreenState extends State<AuthScreen> {
             .showSnackBar(getSnackBar('Please fill your data'));
         return;
       }
-
+      if (_userImageFile == null && authMode == AuthMode.signUp) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(getSnackBar('Please select image'));
+        return;
+      }
       if (!userData['email']!.contains('@') &&
           !userData['email']!.contains('.com')) {
         ScaffoldMessenger.of(context)
@@ -91,23 +94,36 @@ class _AuthScreenState extends State<AuthScreen> {
       });
       final AuthenticatedUser newUser;
       try {
+        // sign up case
         if (authMode == AuthMode.signUp) {
-          await Provider.of<AuthenticationController>(context, listen: false)
-              .signUp(userData['email']!, userData['password']!)
-              .then((value) async {
-            await Provider.of<UserDataController>(context, listen: false)
-                .registerUser(userData);
-            Navigator.of(context).pushReplacementNamed(HomeScreen.routName);
+          final storage = FirebaseStorage.instance;
 
-            // await Provider.of<AuthenticationController>(context, listen: false)
-            //     .registerUser(_guestData);
-          });
-        } else {
+          await Provider.of<AuthenticationController>(context, listen: false).signUp(userData['email']!, userData['password']!);
+
+          final ref = await storage.ref().child('user_images').child('$globalUserIdentification.jpg');
+
+          await ref.putFile(_userImageFile!);
+          final imageUrl = await ref.getDownloadURL();
+          userData['imageUrl'] = imageUrl;
+          if (kDebugMode) {
+            print(imageUrl);
+          }
+
+          await Provider.of<UserDataController>(context, listen: false)
+              .registerUser(userData)
+              .then((value) => Navigator.of(context)
+                  .pushReplacementNamed(HomeScreen.routName));
+
+          // await Provider.of<AuthenticationController>(context, listen: false)
+          //     .registerUser(_guestData);
+        }
+        // login case
+        else {
           await Provider.of<AuthenticationController>(context, listen: false)
               .login(userData['email']!, userData['password']!)
               .then((value) async {
             await Provider.of<UserDataController>(context, listen: false)
-                .fetchUserData();
+                .getUserDataById(FirebaseAuth.instance.currentUser!.uid);
             Navigator.of(context).pushReplacementNamed(HomeScreen.routName);
 
             // await Provider.of<NewUser>(context,listen: false).fetchUserData();
@@ -132,10 +148,10 @@ class _AuthScreenState extends State<AuthScreen> {
               'This E-mail is not registered, please signup and try again!';
         }
         ScaffoldMessenger.of(context)
-            .showSnackBar(getSnackBar("another type " + errorMessage));
+            .showSnackBar(getSnackBar("another type : $errorMessage" ));
       } catch (e) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(getSnackBar("customer error \n" + e.toString()));
+            .showSnackBar(getSnackBar("customer error : $e" ));
       }
       setState(() {
         _isLoading = false;
@@ -166,13 +182,17 @@ class _AuthScreenState extends State<AuthScreen> {
               height: size.setHeight(100),
             ),
             Container(
-              height: size.setHeight(400),
+              height: authMode == AuthMode.signUp
+                  ? size.setHeight(560)
+                  : size.setHeight(300),
               width: size.setWidth(340),
               child: Card(
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: <Widget>[
+                      if (authMode == AuthMode.signUp)
+                        UserImagePicker(_pickedImage),
                       if (authMode == AuthMode.signUp)
                         Flexible(
                           child: Container(
@@ -215,10 +235,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 userData['email'] = val;
                               },
                               onFieldSubmitted: (email) {
-                                  FocusScope.of(context)
-                                      .requestFocus(passwordFocusNode);
-
-
+                                FocusScope.of(context)
+                                    .requestFocus(passwordFocusNode);
                               }),
                         ),
                       ),
@@ -256,7 +274,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 FocusScope.of(context)
                                     .requestFocus(confirmPasswordFocusNode);
                               } else {
-                                emailFocusNode.removeListener(() { });
+                                emailFocusNode.removeListener(() {});
                               }
                             },
                           ),
@@ -288,7 +306,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                       }),
                                   hintText: 'Confirm password'),
                               onFieldSubmitted: (_) {
-                                emailFocusNode.removeListener(() { });
+                                emailFocusNode.removeListener(() {});
                               },
                               onChanged: (val) {
                                 userData['confirmPassword'] = val;

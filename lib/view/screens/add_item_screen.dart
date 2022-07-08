@@ -1,4 +1,5 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -36,12 +37,19 @@ class _AddItemScreenState extends State<AddItemScreen> {
   var userName;
   @override
   void didChangeDependencies() async {
-    final user = await Provider.of<UserDataController>(context, listen: false)
-        .currentUserInfo;
-    userName = user!.name;
+      final user =
+          await Provider.of<UserDataController>(context).currentUserInfo;
+      setState((){
+        userName = user!.name;
+      }) ;
+
     super.didChangeDependencies();
   }
-
+@override
+  void dispose() {
+    userName ==null;
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final size = SizeHelper(context);
@@ -79,7 +87,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
               postText: postData['postText'],
               itemName: postData['itemName'],
               userName: userName,
-              userId: userIdentification);
+              userId: globalUserIdentification,
+            questionId: globalQuestionIdentification,
+            userImageUrl: currentUserImageUrl,
+          );
           await Provider.of<PostController>(context, listen: false)
               .createPost(tempPost)
               .then((value) {
@@ -164,12 +175,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   height: size.setHeight(150),
                   margin: EdgeInsets.only(left: size.setWidth(25)),
                   padding: EdgeInsets.all(size.setWidth(10)),
-                  child: Text(
-                    'Hello $userName, \nThank you for being cooperative person',
-                    style: TextStyle(
-                        fontSize: size.setWidth(24),
-                        fontFamily: 'Nexa',
-                        fontWeight: FontWeight.bold),
+                  child: Consumer<UserDataController>(
+                    builder: (_, userDataSnapshot, child) => Text(
+                      'Hello ${userDataSnapshot.user?.name ?? 'dear'}, \nThank you for being cooperative person',
+                      style: TextStyle(
+                          fontSize: size.setWidth(24),
+                          fontFamily: 'Nexa',
+                          fontWeight: FontWeight.bold),
+                    ),
+
                   ),
                 ),
               ),

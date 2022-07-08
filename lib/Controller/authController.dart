@@ -56,9 +56,9 @@ class AuthenticationController with ChangeNotifier {
       }
       _userId = userCredential!.user!.uid;
       _token = await userCredential!.user!.getIdToken();
-      userIdentification = userCredential!.user!.uid;
+      globalUserIdentification = userCredential!.user!.uid;
       print(_token);
-      print(userIdentification);
+      print(globalUserIdentification);
       isAuth;
       notifyListeners();
 
@@ -114,7 +114,7 @@ class AuthenticationController with ChangeNotifier {
     if (loginResponse!.user?.uid == null) {
       return false;
     } else
-      userIdentification = loginResponse.user!.uid;
+      globalUserIdentification = loginResponse.user!.uid;
     return true;
   }
 

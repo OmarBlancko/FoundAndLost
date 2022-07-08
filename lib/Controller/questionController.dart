@@ -4,7 +4,7 @@ import 'package:found_and_lost/main.dart';
 import 'package:found_and_lost/model/question.dart';
 
 class QuestionController with ChangeNotifier{
-  late Question? question;
+   Question? question;
   final db = FirebaseFirestore.instance;
 
   Future<void> createQuestion(String questionText) async {
@@ -14,8 +14,8 @@ class QuestionController with ChangeNotifier{
     };
     try {
       await db.collection('questions').add(tempQuestion).then((documentSnapshot) async {
-        questionIdentification = documentSnapshot.id;
-        print(questionIdentification);
+        globalQuestionIdentification = documentSnapshot.id;
+        print(globalQuestionIdentification);
         await db
             .collection('questions')
             .doc(documentSnapshot.id)
@@ -33,20 +33,24 @@ class QuestionController with ChangeNotifier{
 
   Future<Question?> getQuestionById(String id) async {
     try {
+
+      late final Question q;
       final docRef = await db
-          .collection('items')
+          .collection('questions')
           .doc(id)
           .get()
           .then((DocumentSnapshot doc) {
         final data = doc.data() as Map<String, dynamic>;
-        if (data['itemId'] != null) {
-          question!.questionId = data['questionId'];
-          question!.questionText = data['questionText'];
-        }
+        // print(data);
+
+          Question qs = Question(data['questionId'], data['questionText']);
+
+        question = qs;
+
       });
       notifyListeners();
     } catch (e) {
-      print('error in fetching item : $e');
+      print('error in fetching question : $e');
     }
     return question;
   }

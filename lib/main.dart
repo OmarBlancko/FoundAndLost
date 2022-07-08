@@ -12,6 +12,7 @@ import 'package:found_and_lost/view/screens/add_item_screen.dart';
 import 'package:found_and_lost/view/screens/auth_screen.dart';
 import 'package:found_and_lost/view/screens/home_screen.dart';
 import 'package:found_and_lost/view/screens/lost_items_screen.dart';
+import 'package:found_and_lost/view/screens/question_screen.dart';
 import 'package:found_and_lost/view/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 // import 'package:provider/provider.dart';
@@ -24,8 +25,10 @@ Future<void> main() async {
   runApp(MyApp());
 }
 // ignore: prefer_typing_uninitialized_variables
-var userIdentification;
-var questionIdentification;
+var globalUserIdentification;
+var globalQuestionIdentification;
+var globalAnswerIdentification;
+var currentUserImageUrl;
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -59,6 +62,7 @@ class MyApp extends StatelessWidget {
             HomeScreen.routName:(ctx) => HomeScreen(),
             AddItemScreen.routeName:(ctx) =>AddItemScreen(),
             LostItemsScreen.routeName:(ctx) =>LostItemsScreen(),
+            QuestionScreen.routeName:(ctx) =>QuestionScreen(''),
           },
 
 

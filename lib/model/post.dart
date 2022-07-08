@@ -8,11 +8,15 @@ class Post {
   late final String userName;
   late final String questionId;
   late final String userId;
-  Post(
-      {required this.postId,
-      required this.postingDate,
-      required this.postText,
-      required this.itemName,
-      required this.userName,
-      required this.userId});
+  late final String userImageUrl;
+  Post({
+    required this.postId,
+    required this.postingDate,
+    required this.postText,
+    required this.itemName,
+    required this.userName,
+    required this.userId,
+    required this.questionId,
+    required this.userImageUrl,
+  });
 }

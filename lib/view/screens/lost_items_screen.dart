@@ -14,10 +14,7 @@ class LostItemsScreen extends StatefulWidget {
 
 class _LostItemsScreenState extends State<LostItemsScreen> {
   @override
-  Future<void> didChangeDependencies() async {
-    // final posts = Provider.of<PostController>(context).posts;
-    super.didChangeDependencies();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,23 +35,29 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
               child: Container(
                 height: size.setHeight(600),
                 child: FutureBuilder(
-                  future: Provider.of<PostController>(context,listen: false).fetchAndSetPosts(),
-                  builder: (_,snapshot) {
+                  future: Provider.of<PostController>(context, listen: false)
+                      .fetchAndSetPosts(),
+                  builder: (_, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
-                      return  Consumer<PostController>(
+                      return Consumer<PostController>(
                           builder: (_, postsData, child) {
-                            print(postsData.posts.length);
-                            return ListView.builder(
-                              padding: const EdgeInsets.all(10),
-                              itemCount: postsData.posts.length,
-                              itemBuilder: (ctx,i) => ItemWidget(postsData.posts[i]),
-                            ); }
+                        // print(postsData.posts.length);
+                        if (postsData.posts.length == 0) {
+                          return const Center(child: Text('There\'s no lost items now :('),);
+                        } else {
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(10),
+                            itemCount: postsData.posts.length,
+                            itemBuilder: (ctx, i) =>
+                                ItemWidget(postsData.posts[i]),
+                          );
+                        }
+                      });
+                    } else {
+                      return const SpinKitThreeInOut(
+                        color:Colors.blueGrey,
                       );
                     }
-                    else
-                      {
-                        return SpinKitThreeInOut(color: Theme.of(context).colorScheme.secondary,);
-                      }
                   },
                 ),
               ),

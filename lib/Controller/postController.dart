@@ -28,7 +28,9 @@ class PostController with ChangeNotifier {
             postText: post['postText'],
             itemName: post['itemName'],
             userName: post['userName'],
-            userId: post['userId']));
+            userId: post['userId'],
+        userImageUrl: post['userImageUrl'],
+        questionId: post['questionId']));
       }
       _posts = loadedPosts;
       // print(_posts.length);
@@ -61,7 +63,9 @@ class PostController with ChangeNotifier {
             postText: post['postText'],
             itemName: post['itemName'],
             userName: post['userName'],
-            userId: post['userId']));
+            userId: post['userId'],
+            userImageUrl: post['userImageUrl'],
+            questionId: post['questionId']));
       if (kDebugMode) {
         print(post['userName']);
       }
@@ -90,8 +94,9 @@ class PostController with ChangeNotifier {
       'postText': post.postText,
       'itemName': post.itemName,
       'userName': post.userName,
-      'questionId': questionIdentification,
-      'userId': post.userId
+      'questionId': globalQuestionIdentification,
+      'userId': post.userId,
+      'userImageUrl':currentUserImageUrl,
     };
     //  final Question q = Question('1', 'First Question ?');
     //  final  qController = QuestionController();

@@ -23,8 +23,8 @@ Widget build(BuildContext context) {
             children: [
               IconButton(
                   icon: Icon(Icons.menu, size: 30), onPressed: () async {
-                    await Provider.of<PostController>(context,listen: false).fetchAndSetPosts();
-                    // globalKey.currentState?.openDrawer();
+                    // await Provider.of<PostController>(context,listen: false).fetchAndSetPosts();
+                    globalKey.currentState?.openDrawer();
 
               }),
             ],
