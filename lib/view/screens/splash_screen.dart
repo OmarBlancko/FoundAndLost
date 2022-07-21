@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToHome() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 2));
     bool result = await Provider.of<AuthenticationController>(context,listen: false).tryAutoLogin();
     if(result == true) {
       print('auto login successfully');
@@ -44,13 +44,20 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Column(
         children: [
           SizedBox(
-            height: size.setHeight(150),
+            height: size.setHeight(100),
           ),
-          Text('Welcome to \n     Found \n         & \n      Lost',
+          Text('Welcome to ',
               style: TextStyle(
                   fontSize: size.setWidth(32),
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.bold)),
+                  fontFamily: 'Aller',
+                  fontWeight: FontWeight.bold),),
+          Container(
+            height: size.setHeight(400),
+            width: double.infinity,
+            child: FittedBox(
+              child: Image.asset('assets/images/FoundAndLost.jpg'),
+            ),
+          ),
           SizedBox(
             height: size.setHeight(30),
           ),

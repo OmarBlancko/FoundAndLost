@@ -1,5 +1,3 @@
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -55,6 +53,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     final size = SizeHelper(context);
 
     void _trySubmit() async {
+      FocusScope.of(context).unfocus();
       if (postData['itemName'] == '' ||
           postData['postText'] == '' ||
           postData['questionText'] == '') {
@@ -81,7 +80,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
         await Provider.of<QuestionController>(context, listen: false)
             .createQuestion(postData['questionText'])
             .then((value) async {
-          final tempPost = Post(
+              if(globalCurrentUserImageUrl == null) {
+                await Provider.of<UserDataController>(context,listen: false).fetchUserData();
+              }
+              final tempPost = Post(
               postId: '',
               postingDate: DateTime.now().toString(),
               postText: postData['postText'],
@@ -89,7 +91,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
               userName: userName,
               userId: globalUserIdentification,
             questionId: globalQuestionIdentification,
-            userImageUrl: currentUserImageUrl,
+            userImageUrl: globalCurrentUserImageUrl,
           );
           await Provider.of<PostController>(context, listen: false)
               .createPost(tempPost)
@@ -162,6 +164,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              BackButton(),
               SizedBox(
                 height: size.setHeight(40),
               ),
@@ -170,20 +173,20 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   decoration: BoxDecoration(
                       borderRadius:
                           BorderRadius.all(Radius.circular(size.setWidth(8))),
-                      border: Border.all(color: Colors.black54, width: 3)),
+                      border: Border.all(color: Colors.black54, width: 1)),
                   width: size.setWidth(340),
-                  height: size.setHeight(150),
+               //   height: size.setHeight(150),
                   margin: EdgeInsets.only(left: size.setWidth(25)),
                   padding: EdgeInsets.all(size.setWidth(10)),
                   child: Consumer<UserDataController>(
                     builder: (_, userDataSnapshot, child) => Text(
-                      'Hello ${userDataSnapshot.user?.name ?? 'dear'}, \nThank you for being cooperative person',
+                     /* 'Hey ${userDataSnapshot.user?.name ?? 'there'}, \nThanks for being cooperative person',*/
+                      'Thanks for being such a good person,  is looking for his property out there',
                       style: TextStyle(
                           fontSize: size.setWidth(24),
                           fontFamily: 'Nexa',
                           fontWeight: FontWeight.bold),
                     ),
-
                   ),
                 ),
               ),
@@ -194,7 +197,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 child: Container(
                   padding: EdgeInsets.only(left: size.setWidth(24)),
                   child: Text(
-                    'You can share post with lost item now',
+                    'What did you find ?',
                     style: TextStyle(fontSize: size.setWidth(18)),
                   ),
                 ),
@@ -210,7 +213,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        LabelText('Item name'),
+                        LabelText('Main Item'),
                         Flexible(
                           child: Container(
                             padding: EdgeInsets.only(left: size.setWidth(7)),
@@ -220,7 +223,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                             child: TextFormField(
                               maxLines: 1,
                               decoration:
-                                  InputDecoration(hintText: 'Item name'),
+                                  InputDecoration(hintText: 'Wallet, watch ..'),
                               onChanged: (itemName) {
                                 postData['itemName'] = itemName;
                               },
@@ -246,7 +249,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               maxLines: 3,
                               decoration: const InputDecoration(
                                   hintText:
-                                      'Add short description and the area you found it in'),
+                                      'Few Words discriping the item...'),
                               onChanged: (postText) {
                                 postData['postText'] = postText;
                               },
@@ -260,7 +263,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         SizedBox(
                           height: size.setHeight(10),
                         ),
-                        LabelText('Question'),
+                        LabelText('Remarkable Question'),
                         Flexible(
                           child: Container(
                             padding: EdgeInsets.only(left: size.setWidth(7)),
@@ -272,7 +275,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               maxLines: 3,
                               decoration: const InputDecoration(
                                   hintText:
-                                      'Add question related to item to identify the real owner '),
+                                      'A Question identifing the item'),
                               onChanged: (questionText) {
                                 postData['questionText'] = questionText;
                               },
@@ -294,7 +297,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               Flexible(
                                 child: Container(
                                   child: ElevatedButton(
-                                    child: Text('Add post'),
+                                    child: Text('Post Now'),
                                     onPressed: _trySubmit,
                                   ),
                                 ),

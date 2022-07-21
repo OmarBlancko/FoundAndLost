@@ -33,7 +33,7 @@ class UserDataController with ChangeNotifier {
     try {
       final db = FirebaseFirestore.instance;
       await db.collection('users').doc(globalUserIdentification).set(user);
-      currentUserImageUrl = guestData['imageUrl'];
+      globalCurrentUserImageUrl = guestData['imageUrl'];
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       final guestInfo = json.encode({
@@ -64,7 +64,7 @@ class UserDataController with ChangeNotifier {
               password: data['password'],
               email: data['email'],
               imageUrl: data['imageUrl']);
-          currentUserImageUrl = data['imageUrl'];
+          globalCurrentUserImageUrl = data['imageUrl'];
           if (snapShotData.id == FirebaseAuth.instance.currentUser!.uid) {
             final prefs = await SharedPreferences.getInstance();
             final guestInfo = json.encode({
@@ -111,7 +111,6 @@ class UserDataController with ChangeNotifier {
   }
 
   Future<AuthenticatedUser?> getUserDataById(String userId) async {
-    late final AuthenticatedUser u;
     try {
       final db = FirebaseFirestore.instance;
 
@@ -132,10 +131,11 @@ class UserDataController with ChangeNotifier {
         },
         onError: (e) => print(e),
       );
-      return user;
 
     } catch (error) {
       print('error in get user data by id : $error');
     }
+    return user;
+
   }
 }

@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:found_and_lost/view/screens/auth_screen.dart';
@@ -46,7 +47,6 @@ class AuthenticationController with ChangeNotifier {
   }
 
   Future<void> authUser(String email, String password, AuthMode auth) async {
-    try {
       if (auth == AuthMode.login) {
         userCredential = await authFirebaseInstance.signInWithEmailAndPassword(
             email: email, password: password);
@@ -72,17 +72,7 @@ class AuthenticationController with ChangeNotifier {
       });
       // print(userData);
       prefs.setString('userData', userData);
-    } on PlatformException catch (error) {
-      var message = 'an error occurs please check your credential';
-      if (error.message != null) {
-        message = error.message!;
-      }
-      print(error.toString());
-    } on FirebaseAuthException catch (e) {
-      print("Firebase error >>" + e.message.toString());
-    } catch (err) {
-      print("Error " + err.toString());
-    }
+
   }
 
 

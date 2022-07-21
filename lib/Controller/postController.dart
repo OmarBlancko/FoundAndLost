@@ -24,7 +24,7 @@ class PostController with ChangeNotifier {
       for (var post in temp) {
         loadedPosts.add(Post(
             postId: post['postId'],
-            postingDate: post['postingDate'].toString(),
+            postingDate: post['postingDate'].toString(), // need to modify
             postText: post['postText'],
             itemName: post['itemName'],
             userName: post['userName'],
@@ -47,7 +47,12 @@ class PostController with ChangeNotifier {
       }
     }
   }
+  Post getPostById(String postId) {
+    // get post by  post id
+    return _posts.firstWhere((element) => element.postId == postId);
+  }
   Future<void> getUserPostsByID(String id) async {
+    // get user's post by id
     try {
       List<Post> loadedPosts = [];
       late List<dynamic> temp;
@@ -59,7 +64,7 @@ class PostController with ChangeNotifier {
       for (var post in temp) {
         loadedPosts.add(Post(
             postId: post['postId'],
-            postingDate: post['postingDate'],
+            postingDate: post['postingDate'].toString(),
             postText: post['postText'],
             itemName: post['itemName'],
             userName: post['userName'],
@@ -67,16 +72,14 @@ class PostController with ChangeNotifier {
             userImageUrl: post['userImageUrl'],
             questionId: post['questionId']));
       if (kDebugMode) {
-        print(post['userName']);
+        print(post['itemName']);
       }
       }
       _posts = loadedPosts;
-      if (kDebugMode) {
-        print(_posts[0].userId);
-      }
-      loadedPosts.clear();
+      // if (kDebugMode) {
+      //   print(_posts[0].userId);
+      // }
       temp.clear();
-
       notifyListeners();
     }
     catch (error)
@@ -90,26 +93,14 @@ class PostController with ChangeNotifier {
   Future<void> createPost(Post post) async {
     final postTemp = <String, dynamic>{
       'postId': post.postId,
-      'postingDate': DateTime.now(),
+      'postingDate': Timestamp.now(),
       'postText': post.postText,
       'itemName': post.itemName,
       'userName': post.userName,
       'questionId': globalQuestionIdentification,
       'userId': post.userId,
-      'userImageUrl':currentUserImageUrl,
+      'userImageUrl':globalCurrentUserImageUrl,
     };
-    //  final Question q = Question('1', 'First Question ?');
-    //  final  qController = QuestionController();
-    //  await qController.addQuestion(q);
-    // final postTemp = <String,dynamic> {
-    //   'postId':'1',
-    //   'postingDate':DateTime.now().toString(),
-    //   'postText':'new post',
-    //   'itemName':'watch ',
-    //   'userName':'omar',
-    //   'questionId':questionIdentification,
-    //   'userId':'3'
-    // };
     try {
       await db.collection('posts').add(postTemp).then((documentSnapshot) async {
         await db
@@ -162,10 +153,3 @@ class PostController with ChangeNotifier {
     }
   }
 }
-// late final String postId;
-// late final DateTime postingDate;
-// late final String postText;
-// late final Item item;
-// late final String userName;
-// late final String questionId;
-// late final String userId;

@@ -22,8 +22,10 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            BackButton(),
             Container(
               height: size.setHeight(250),
               width: double.infinity,
@@ -46,6 +48,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                           return const Center(child: Text('There\'s no lost items now :('),);
                         } else {
                           return ListView.builder(
+                            shrinkWrap: true,
                             padding: const EdgeInsets.all(10),
                             itemCount: postsData.posts.length,
                             itemBuilder: (ctx, i) =>

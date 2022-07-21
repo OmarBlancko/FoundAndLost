@@ -29,6 +29,13 @@
             {
               "client_id": "876497785715-j5smg8hmvji50np7neidtcdvv1ip4v78.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "876497785715-l4v5c38qdvmv9jtv0seqd7ooosb4h844.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.foundAndLost"
+              }
             }
           ]
         }
