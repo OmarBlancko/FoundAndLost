@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:found_and_lost/Controller/userDataController.dart';
 import 'package:found_and_lost/helper/sizeHelper.dart';
+import 'package:found_and_lost/main.dart';
 import 'package:found_and_lost/view/screens/question_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -39,7 +41,7 @@ class ItemWidget extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  width: size.setWidth(60),
+                  width: size.setWidth(80),
                   padding: EdgeInsets.only(left: size.setWidth(5)),
                   child: Text(
                     post.userName,
@@ -108,7 +110,10 @@ class ItemWidget extends StatelessWidget {
 
               ),
             ),
-                 Container(
+            /// current user cannot answer question
+            if(post.userId != FirebaseAuth.instance.currentUser!.uid)
+
+              Container(
               padding: EdgeInsets.all(size.setHeight(8)),
               width: size.setWidth(350),
               height: size.setHeight(40),
@@ -132,7 +137,9 @@ class ItemWidget extends StatelessWidget {
                         fontSize: size.setWidth(14),
                       ),),
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuestionScreen(post.questionId)));                      },
+                        globalPostIdentification = post.postId;
+                        globalQuestionIdentification = post.questionId;
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuestionScreen()));                      },
 
                   )),
                 ],

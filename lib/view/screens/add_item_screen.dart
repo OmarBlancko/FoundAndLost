@@ -1,5 +1,3 @@
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -55,6 +53,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     final size = SizeHelper(context);
 
     void _trySubmit() async {
+      FocusScope.of(context).unfocus();
       if (postData['itemName'] == '' ||
           postData['postText'] == '' ||
           postData['questionText'] == '') {
@@ -81,7 +80,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
         await Provider.of<QuestionController>(context, listen: false)
             .createQuestion(postData['questionText'])
             .then((value) async {
-          final tempPost = Post(
+              if(globalCurrentUserImageUrl == null) {
+                await Provider.of<UserDataController>(context,listen: false).fetchUserData();
+              }
+              final tempPost = Post(
               postId: '',
               postingDate: DateTime.now().toString(),
               postText: postData['postText'],
@@ -89,7 +91,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
               userName: userName,
               userId: globalUserIdentification,
             questionId: globalQuestionIdentification,
-            userImageUrl: currentUserImageUrl,
+            userImageUrl: globalCurrentUserImageUrl,
           );
           await Provider.of<PostController>(context, listen: false)
               .createPost(tempPost)
@@ -162,6 +164,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              BackButton(),
               SizedBox(
                 height: size.setHeight(40),
               ),
@@ -183,7 +186,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           fontFamily: 'Nexa',
                           fontWeight: FontWeight.bold),
                     ),
-
                   ),
                 ),
               ),

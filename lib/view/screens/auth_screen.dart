@@ -58,11 +58,12 @@ class _AuthScreenState extends State<AuthScreen> {
     final size = SizeHelper(context);
 
     void _submit() async {
+      FocusScope.of(context).unfocus();
       UserCredential userCredential;
       if ((userData['userName'] == '' ||
-              userData['password'] == '' ||
-              userData['confirmPassword'] == '' ||
-              userData['email'] == '') &&
+          userData['password'] == '' ||
+          userData['confirmPassword'] == '' ||
+          userData['email'] == '') &&
           authMode == AuthMode.signUp) {
         ScaffoldMessenger.of(context)
             .showSnackBar(getSnackBar('Please fill your data'));
@@ -108,11 +109,10 @@ class _AuthScreenState extends State<AuthScreen> {
           if (kDebugMode) {
             print(imageUrl);
           }
-
           await Provider.of<UserDataController>(context, listen: false)
               .registerUser(userData)
               .then((value) => Navigator.of(context)
-                  .pushReplacementNamed(HomeScreen.routName));
+              .pushReplacementNamed(HomeScreen.routName));
 
           // await Provider.of<AuthenticationController>(context, listen: false)
           //     .registerUser(_guestData);
@@ -121,12 +121,13 @@ class _AuthScreenState extends State<AuthScreen> {
         else {
           await Provider.of<AuthenticationController>(context, listen: false)
               .login(userData['email']!, userData['password']!)
-              .then((value) async {
+              .whenComplete(() async {
             await Provider.of<UserDataController>(context, listen: false)
-                .getUserDataById(FirebaseAuth.instance.currentUser!.uid);
-            Navigator.of(context).pushReplacementNamed(HomeScreen.routName);
+                .getUserDataById(globalUserIdentification).whenComplete(() {
+              Navigator.of(context).pushReplacementNamed(HomeScreen.routName);
 
-            // await Provider.of<NewUser>(context,listen: false).fetchUserData();
+            });
+
           });
         }
       } on HttpException catch (error) {
@@ -134,7 +135,7 @@ class _AuthScreenState extends State<AuthScreen> {
         var errorMessage = 'Authentication failed!';
         if (error.toString().contains('EMAIL_EXISTS')) {
           errorMessage =
-              'The email address is already in use by another account';
+          'The email address is already in use by another account';
         } else if (error.toString().contains('TOO_MANY_ATTEMPTS_TRY_LATER')) {
           errorMessage = 'Too many attempts now, Please try again later ';
         } else if (error.toString().contains('INVALID_EMAIL')) {
@@ -145,13 +146,27 @@ class _AuthScreenState extends State<AuthScreen> {
           errorMessage = 'Invalid password please enter correct password';
         } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
           errorMessage =
-              'This E-mail is not registered, please signup and try again!';
+          'This E-mail is not registered, please signup and try again!';
         }
+        else if (error.toString().contains('wrong-password')) {
+          errorMessage =
+          'Wrong password!';
+        }
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context)
-            .showSnackBar(getSnackBar("another type : $errorMessage" ));
+            .showSnackBar(getSnackBar("Invalid username or password "));
+        return;
+
       } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context)
-            .showSnackBar(getSnackBar("customer error : $e" ));
+            .showSnackBar(getSnackBar("Invalid username or password " ));
+        return;
+
       }
       setState(() {
         _isLoading = false;
@@ -160,7 +175,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
+          child: Column(
           children: <Widget>[
             Container(
                 height: size.setWidth(120),

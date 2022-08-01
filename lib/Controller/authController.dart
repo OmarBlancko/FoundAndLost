@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:found_and_lost/view/screens/auth_screen.dart';
@@ -46,43 +47,32 @@ class AuthenticationController with ChangeNotifier {
   }
 
   Future<void> authUser(String email, String password, AuthMode auth) async {
-    try {
-      if (auth == AuthMode.login) {
-        userCredential = await authFirebaseInstance.signInWithEmailAndPassword(
-            email: email, password: password);
-      } else {
-        userCredential = await authFirebaseInstance.createUserWithEmailAndPassword(
-            email: email, password: password);
-      }
-      _userId = userCredential!.user!.uid;
-      _token = await userCredential!.user!.getIdToken();
-      globalUserIdentification = userCredential!.user!.uid;
-      print(_token);
-      print(globalUserIdentification);
-      isAuth;
-      notifyListeners();
-
-      /// to store user data on device
-      final prefs = await SharedPreferences.getInstance();
-      final userData = json.encode({
-        'token': _token,
-        'userId': _userId,
-        'email': email,
-        'password': password,
-      });
-      // print(userData);
-      prefs.setString('userData', userData);
-    } on PlatformException catch (error) {
-      var message = 'an error occurs please check your credential';
-      if (error.message != null) {
-        message = error.message!;
-      }
-      print(error.toString());
-    } on FirebaseAuthException catch (e) {
-      print("Firebase error >>" + e.message.toString());
-    } catch (err) {
-      print("Error " + err.toString());
+    if (auth == AuthMode.login) {
+      userCredential = await authFirebaseInstance.signInWithEmailAndPassword(
+          email: email, password: password);
+    } else {
+      userCredential = await authFirebaseInstance.createUserWithEmailAndPassword(
+          email: email, password: password);
     }
+    _userId = userCredential!.user!.uid;
+    _token = await userCredential!.user!.getIdToken();
+    globalUserIdentification = userCredential!.user!.uid;
+    print(_token);
+    print(globalUserIdentification);
+    isAuth;
+    notifyListeners();
+
+    /// to store user data on device
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.encode({
+      'token': _token,
+      'userId': _userId,
+      'email': email,
+      'password': password,
+    });
+    // print(userData);
+    prefs.setString('userData', userData);
+
   }
 
 
